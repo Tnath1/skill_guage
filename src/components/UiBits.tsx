@@ -7,6 +7,7 @@ type InfoCardProps = {
   children: ReactNode
 }
 
+
 export function InfoCard({
   eyebrow,
   title,
@@ -14,7 +15,7 @@ export function InfoCard({
   children,
 }: InfoCardProps) {
   return (
-    <section className="rounded-[2rem] border border-slate-200/80 bg-white/86 p-6 shadow-[0_26px_90px_-44px_rgba(15,23,42,0.32)] backdrop-blur dark:border-white/10 dark:bg-white/5 dark:shadow-[0_26px_90px_-44px_rgba(2,6,23,0.9)]">
+    <section className="rounded-4xl border border-slate-200/80 bg-white/86 p-6 shadow-[0_26px_90px_-44px_rgba(15,23,42,0.32)] backdrop-blur dark:border-white/10 dark:bg-white/5 dark:shadow-[0_26px_90px_-44px_rgba(2,6,23,0.9)]">
       <p className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-500 dark:text-slate-400">
         {eyebrow}
       </p>
