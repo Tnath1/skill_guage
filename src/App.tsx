@@ -1,6 +1,4 @@
 import {
-  startTransition,
-  useDeferredValue,
   useEffect,
   useEffectEvent,
   useRef,
@@ -18,7 +16,6 @@ function App() {
   const theme = useSkillGaugeStore((state) => state.theme)
   const status = useSkillGaugeStore((state) => state.status)
   const subjects = useSkillGaugeStore((state) => state.subjects)
-  const subjectQuery = useSkillGaugeStore((state) => state.subjectQuery)
   const selectedSubject = useSkillGaugeStore((state) => state.selectedSubject)
   const questions = useSkillGaugeStore((state) => state.questions)
   const answers = useSkillGaugeStore((state) => state.answers)
@@ -30,7 +27,6 @@ function App() {
   const score = useSkillGaugeStore((state) => state.score)
   const errorMessage = useSkillGaugeStore((state) => state.errorMessage)
   const toggleTheme = useSkillGaugeStore((state) => state.toggleTheme)
-  const setSubjectQuery = useSkillGaugeStore((state) => state.setSubjectQuery)
   const fetchSubjects = useSkillGaugeStore((state) => state.fetchSubjects)
   const startQuiz = useSkillGaugeStore((state) => state.startQuiz)
   const answerCurrentQuestion = useSkillGaugeStore(
@@ -69,10 +65,6 @@ function App() {
     return () => window.clearInterval(id)
   }, [status, currentQuestionIndex, runTimerStep])
 
-  const deferredQuery = useDeferredValue(subjectQuery.trim().toLowerCase())
-  const filteredSubjects = subjects.filter((subject) =>
-    subject.name.toLowerCase().includes(deferredQuery),
-  )
   const currentQuestion = questions[currentQuestionIndex]
   const attemptedCount = Object.keys(answers).length
   const unansweredCount = Object.values(answers).filter(
@@ -103,16 +95,9 @@ function App() {
         {(status === 'ready' || status === 'loading-quiz') && (
           <SubjectSelectionScreen
             status={status}
-            subjects={filteredSubjects}
-            totalSubjects={subjects.length}
-            searchQuery={subjectQuery}
+            subjects={subjects}
             selectedSubject={selectedSubject}
             errorMessage={errorMessage}
-            onSearchChange={(value) =>
-              startTransition(() => {
-                setSubjectQuery(value)
-              })
-            }
             onStartQuiz={(subject) => void startQuiz(subject)}
           />
         )}
