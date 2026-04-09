@@ -93,10 +93,4 @@ When the app loads, the user can:
 
 ### Available Scripts
 
-- `npm run dev` starts the development server
-- `npm run build` creates the production build
-- `npm run preview` previews the production build locally
 
-## Builder Credit
-
-Built by [Tnath1](https://github.com/Tnath1).
