@@ -29,10 +29,17 @@ export function QuizScreen({
   const attemptedCount = Object.keys(answers).length
   const minutes = Math.floor(timeRemaining / 60)
   const seconds = String(timeRemaining % 60).padStart(2, '0')
-  const isCriticalTime = timeRemaining <= 10
+  const isCriticalTime = timeRemaining <= 15
   const completedPercent = useMemo(() => {
     return totalQuestions ? (attemptedCount / totalQuestions) * 100 : 0
   }, [attemptedCount, totalQuestions])
+  const countdownPercent = useMemo(() => {
+    return questionDuration ? (timeRemaining / questionDuration) * 100 : 0
+  }, [questionDuration, timeRemaining])
+  const ringRadius = 32
+  const ringCircumference = 2 * Math.PI * ringRadius
+  const ringOffset =
+    ringCircumference - (Math.max(countdownPercent, 0) / 100) * ringCircumference
 
   useEffect(() => {
     setPendingIndex(null)
@@ -64,14 +71,45 @@ export function QuizScreen({
               <p className="text-sm font-medium uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
                 Question {currentQuestionIndex + 1} of {totalQuestions}
               </p>
-              <div
-                className={`rounded-full px-4 py-2 text-sm font-semibold ${
-                  isCriticalTime
-                    ? 'bg-rose-500/12 text-rose-700 dark:bg-rose-400/12 dark:text-rose-200'
-                    : 'bg-slate-100 text-slate-600 dark:bg-white/8 dark:text-slate-200'
-                }`}
-              >
-                {minutes}:{seconds}
+              <div className="flex items-center gap-3">
+                <div className="relative flex h-20 w-20 items-center justify-center">
+                  <svg
+                    viewBox="0 0 80 80"
+                    className="-scale-x-100 rotate-90 h-20 w-20"
+                    aria-hidden="true"
+                  >
+                    <circle
+                      cx="40"
+                      cy="40"
+                      r={ringRadius}
+                      className="fill-none stroke-slate-200 dark:stroke-white/10"
+                      strokeWidth="6"
+                    />
+                    <circle
+                      cx="40"
+                      cy="40"
+                      r={ringRadius}
+                      className={`fill-none transition-all duration-1000 ${
+                        isCriticalTime
+                          ? 'stroke-rose-500 dark:stroke-rose-400'
+                          : 'stroke-emerald-500 dark:stroke-emerald-400'
+                      }`}
+                      strokeWidth="6"
+                      strokeLinecap="round"
+                      strokeDasharray={ringCircumference}
+                      strokeDashoffset={ringOffset}
+                    />
+                  </svg>
+                  <div
+                    className={`absolute rounded-full px-3 py-1 text-sm font-semibold ${
+                      isCriticalTime
+                        ? 'text-rose-700 dark:text-rose-200'
+                        : 'text-emerald-700 dark:text-emerald-200'
+                    }`}
+                  >
+                    {minutes}:{seconds}
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -126,7 +164,15 @@ export function QuizScreen({
                 <span>
                   Q{currentQuestionIndex + 1}/{totalQuestions}
                 </span>
-                <span>{minutes}:{seconds}</span>
+                <span
+                  className={
+                    isCriticalTime
+                      ? 'font-semibold text-rose-600 dark:text-rose-300'
+                      : ''
+                  }
+                >
+                  {minutes}:{seconds}
+                </span>
                 <span>{questionDuration}s each</span>
                 <span>
                   {attemptedCount}/{totalQuestions} completed

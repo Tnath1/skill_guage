@@ -1,4 +1,5 @@
 import { ErrorIcon } from './Icons'
+import type { QuizCatalogItem } from '../store/useSkillGaugeStore'
 
 export function CatalogLoadingScreen() {
   return (
@@ -43,6 +44,28 @@ export function CatalogErrorScreen({
         >
           Try again
         </button>
+      </div>
+    </section>
+  )
+}
+
+export function QuizLoadingScreen({
+  selectedSubject,
+}: {
+  selectedSubject: QuizCatalogItem | null
+}) {
+  return (
+    <section className="grid flex-1 place-items-center">
+      <div className="w-full max-w-xl rounded-[2rem] border border-slate-200/80 bg-white/88 p-10 text-center shadow-[0_24px_80px_-38px_rgba(15,23,42,0.35)] backdrop-blur dark:border-white/10 dark:bg-white/5 dark:shadow-[0_24px_80px_-38px_rgba(2,6,23,0.88)]">
+        <div className="mx-auto h-14 w-14 animate-spin rounded-full border-4 border-slate-200 border-t-sky-500 dark:border-white/10 dark:border-t-sky-300" />
+        <h1 className="mt-6 text-3xl font-semibold tracking-tight text-slate-950 dark:text-white">
+          Preparing your assessment
+        </h1>
+        <p className="mt-3 text-base leading-7 text-slate-600 dark:text-slate-300">
+          {selectedSubject
+            ? `Loading ${selectedSubject.name} so you can continue straight into the quiz.`
+            : 'Loading the selected subject so you can continue straight into the quiz.'}
+        </p>
       </div>
     </section>
   )
