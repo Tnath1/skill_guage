@@ -36,7 +36,9 @@ function App() {
   const answerCurrentQuestion = useSkillGaugeStore(
     (state) => state.answerCurrentQuestion,
   )
-  const resetToSubjectSelection = useSkillGaugeStore((state) => state.resetToSubjectSelection)
+  const resetToSubjectSelection = useSkillGaugeStore(
+    (state) => state.resetToSubjectSelection,
+  )
 
   const hasFetchedRef = useRef(false)
 
@@ -136,7 +138,12 @@ function App() {
             unansweredCount={unansweredCount}
             incorrectCount={incorrectCount}
             scorePercent={scorePercent}
-            onReset={resetToSubjectSelection}
+            onRetake={() => {
+              if (selectedSubject) {
+                void startQuiz(selectedSubject)
+              }
+            }}
+            onTakeAnother={resetToSubjectSelection}
           />
         ) : null}
       </div>
