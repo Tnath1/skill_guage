@@ -36,17 +36,67 @@ Skill Gauge is a modern frontend assessment app built for quick skill testing. U
 
 ## Getting Started
 
+### Prerequisites
+
+Before running the project locally, make sure you have:
+
+- Node.js installed
+- npm available on your machine
+
+### Installation
+
+Clone the repository and move into the project folder:
+
+```bash
+git clone https://github.com/Tnath1/skill_guage.git
+cd skill_guage
+```
+
+Install the project dependencies:
+
 ```bash
 npm install
+```
+
+### Run Locally
+
+Start the development server:
+
+```bash
 npm run dev
+```
+
+Once the server starts, open the local URL shown in your terminal.
+
+### Production Build
+
+Create a production build:
+
+```bash
 npm run build
+```
+
+Preview the production build locally:
+
+```bash
 npm run preview
 ```
+
+### What To Expect
+
+When the app loads, the user can:
+
+- choose a skill to assess
+- take a timed quiz with up to 10 questions
+- view a final score at the end
+- review answers or retake the assessment
+
+### Available Scripts
+
+- `npm run dev` starts the development server
+- `npm run build` creates the production build
+- `npm run preview` previews the production build locally
 
 ## Builder Credit
 
 Built by [Tnath1](https://github.com/Tnath1).
-
-## License
-
-This project is currently unlicensed unless you choose to add a license file.
