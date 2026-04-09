@@ -47,6 +47,4 @@ npm run preview
 
 Built by [Tnath1](https://github.com/Tnath1).
 
-## License
 
-This project is currently unlicensed unless you choose to add a license file.
