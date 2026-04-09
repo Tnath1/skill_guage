@@ -86,7 +86,6 @@ function App() {
       <div className="relative mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 pb-8 sm:px-6 lg:px-10">
         <AppHeader
           theme={theme}
-          selectedSubject={selectedSubject}
           onToggleTheme={toggleTheme}
         />
         {status === 'loading-subjects' ? <CatalogLoadingScreen /> : null}
