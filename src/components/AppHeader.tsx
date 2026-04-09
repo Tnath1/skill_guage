@@ -9,7 +9,7 @@ type AppHeaderProps = {
 
 export function AppHeader({
   theme,
-  selectedSubject,
+  // selectedSubject,
   onToggleTheme,
 }: AppHeaderProps) {
   return (
