@@ -1,15 +1,13 @@
-import type { QuizCatalogItem, Theme } from '../store/useSkillGaugeStore'
+import type { Theme } from '../store/useSkillGaugeStore'
 import { MoonIcon, SunIcon } from './Icons'
 
 type AppHeaderProps = {
   theme: Theme
-  selectedSubject: QuizCatalogItem | null
   onToggleTheme: () => void
 }
 
 export function AppHeader({
   theme,
-  // selectedSubject,
   onToggleTheme,
 }: AppHeaderProps) {
   return (
