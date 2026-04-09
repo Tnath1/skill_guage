@@ -75,7 +75,7 @@ export function QuizScreen({
                 <div className="relative flex h-20 w-20 items-center justify-center">
                   <svg
                     viewBox="0 0 80 80"
-                    className="-rotate-90 h-20 w-20"
+                    className="-scale-x-100 rotate-90 h-20 w-20"
                     aria-hidden="true"
                   >
                     <circle
