@@ -1,12 +1,11 @@
-import type { ReactNode } from 'react'
+import type { ReactNode } from "react";
 
 type InfoCardProps = {
-  eyebrow: string
-  title: string
-  description: string
-  children: ReactNode
-}
-
+  eyebrow: string;
+  title: string;
+  description: string;
+  children: ReactNode;
+};
 
 export function InfoCard({
   eyebrow,
@@ -27,13 +26,13 @@ export function InfoCard({
       </p>
       <div className="mt-6">{children}</div>
     </section>
-  )
+  );
 }
 
 type MiniMetricProps = {
-  label: string
-  value: string
-}
+  label: string;
+  value: string;
+};
 
 export function MiniMetric({ label, value }: MiniMetricProps) {
   return (
@@ -45,7 +44,7 @@ export function MiniMetric({ label, value }: MiniMetricProps) {
         {value}
       </p>
     </div>
-  )
+  );
 }
 
 export function RulePill({ label }: { label: string }) {
@@ -53,5 +52,5 @@ export function RulePill({ label }: { label: string }) {
     <div className="rounded-full border border-slate-200/80 bg-slate-100/80 px-4 py-3 text-sm font-medium text-slate-700 dark:border-white/10 dark:bg-slate-950/60 dark:text-slate-200">
       {label}
     </div>
-  )
+  );
 }
