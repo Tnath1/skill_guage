@@ -6,7 +6,11 @@ import {
 
 import { AppHeader } from './components/AppHeader'
 import { BackgroundGlow } from './components/BackgroundGlow'
-import { CatalogErrorScreen, CatalogLoadingScreen } from './components/StateScreens'
+import {
+  CatalogErrorScreen,
+  CatalogLoadingScreen,
+  QuizLoadingScreen,
+} from './components/StateScreens'
 import { QuizScreen } from './components/QuizScreen'
 import { ResultsScreen } from './components/ResultsScreen'
 import { SubjectSelectionScreen } from './components/SubjectSelectionScreen'
@@ -92,7 +96,10 @@ function App() {
             onRetry={() => void fetchSubjects()}
           />
         ) : null}
-        {(status === 'ready' || status === 'loading-quiz') && (
+        {status === 'loading-quiz' ? (
+          <QuizLoadingScreen selectedSubject={selectedSubject} />
+        ) : null}
+        {status === 'ready' && (
           <SubjectSelectionScreen
             status={status}
             subjects={subjects}
