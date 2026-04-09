@@ -51,28 +51,32 @@ function App() {
       </div>
 
       <div className="relative mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 py-6 sm:px-6 lg:px-10">
-        <header className="mb-8 flex items-center justify-between">
-          <button
-            type="button"
-            onClick={toggleTheme}
-            className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-slate-300/70 bg-white/80 text-slate-700 shadow-lg shadow-slate-200/50 transition hover:-translate-y-0.5 hover:bg-white dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:shadow-slate-950/40 dark:hover:bg-white/10"
-            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-          >
-            {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
-          </button>
+        <header className="sticky top-4 z-30 mb-8">
+          <div className="flex items-center justify-between rounded-[1.75rem] border border-slate-200/80 bg-white/85 px-4 py-3 shadow-[0_20px_45px_-24px_rgba(15,23,42,0.25)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/75 dark:shadow-[0_20px_45px_-24px_rgba(2,6,23,0.85)] sm:px-5">
+            <div className="flex items-center gap-3">
+              {/* <img
+                src="/skillgauge_ogo.png"
+                alt="Skill Gauge logo"
+                className="h-11 w-auto rounded-2xl object-contain sm:h-12"
+              /> */}
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.32em] text-sky-600 dark:text-sky-300">
+                  Skill Gauge
+                </p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  Quick capability check
+                </p>
+              </div>
+            </div>
 
-          <div className="flex items-center gap-3 rounded-full border border-slate-200/80 bg-white/80 px-4 py-2 shadow-lg shadow-slate-200/50 backdrop-blur dark:border-white/10 dark:bg-white/5 dark:shadow-slate-950/40">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-950 text-white dark:bg-sky-400 dark:text-slate-950">
-              <LogoMark />
-            </div>
-            <div className="text-right">
-              <p className="text-xs font-semibold uppercase tracking-[0.32em] text-sky-600 dark:text-sky-300">
-                Skill Gauge
-              </p>
-              <p className="text-sm text-slate-500 dark:text-slate-400">
-                Quick capability check
-              </p>
-            </div>
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-slate-300/70 bg-white/80 text-slate-700 shadow-lg shadow-slate-200/50 transition hover:-translate-y-0.5 hover:bg-white dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:shadow-slate-950/40 dark:hover:bg-white/10"
+              aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+            >
+              {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
+            </button>
           </div>
         </header>
 
@@ -429,14 +433,6 @@ function MoonIcon() {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-    </svg>
-  )
-}
-
-function LogoMark() {
-  return (
-    <svg viewBox="0 0 32 32" className="h-5 w-5 fill-current" aria-hidden="true">
-      <path d="M6 24.5h4V12H6Zm8 0h4V7h-4Zm8 0h4V16h-4Z" />
     </svg>
   )
 }
