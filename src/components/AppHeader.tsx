@@ -9,7 +9,7 @@ type AppHeaderProps = {
 
 export function AppHeader({
   theme,
-  selectedSubject,
+  // selectedSubject,
   onToggleTheme,
 }: AppHeaderProps) {
   return (
@@ -28,7 +28,7 @@ export function AppHeader({
                 Skill
               </span>
               <span className="relative mx-1 inline-flex h-7 w-2 items-center justify-center">
-                <span className="block h-7 w-[1.5px] rotate-[24deg] rounded-full bg-sky-500/80 dark:bg-sky-300/85" />
+                <span className="block h-7 w-[1.5px] rotate-24 rounded-full bg-sky-500/80 dark:bg-sky-300/85" />
               </span>
               <span className="font-extralight tracking-[-0.05em] text-sky-500 dark:text-sky-300">
                 Gauge
