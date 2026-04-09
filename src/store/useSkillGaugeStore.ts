@@ -1,257 +1,339 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-type Theme = 'dark' | 'light'
+export type Theme = 'dark' | 'light'
 
-type SkillOption = {
-  id: string
-  label: string
-  description: string
-  score: number
+export type AppStatus =
+  | 'loading-subjects'
+  | 'ready'
+  | 'loading-quiz'
+  | 'quiz'
+  | 'results'
+  | 'error'
+
+export type QuizCatalogItem = {
+  name: string
+  fileName: string
 }
 
-type SkillQuestion = {
+type QuizCatalogResponse = {
+  quizzes: QuizCatalogItem[]
+}
+
+type RemoteQuizQuestion = {
+  question: string
+  options: string[]
+  _ps: number
+}
+
+export type QuizQuestion = {
   id: string
-  category: string
   prompt: string
-  context: string
-  options: SkillOption[]
+  options: string[]
+  correctIndex: number
 }
+
+type StoredAnswer = number | null
 
 type SkillGaugeState = {
   theme: Theme
-  questions: SkillQuestion[]
+  status: AppStatus
+  subjects: QuizCatalogItem[]
+  subjectQuery: string
+  selectedSubject: QuizCatalogItem | null
+  questions: QuizQuestion[]
+  answers: Record<string, StoredAnswer>
   currentQuestionIndex: number
-  answers: Record<string, string>
-  isComplete: boolean
+  questionDuration: number
+  timeRemaining: number
+  score: number
+  errorMessage: string | null
   toggleTheme: () => void
-  selectAnswer: (questionId: string, optionId: string) => void
-  nextQuestion: () => void
-  previousQuestion: () => void
-  submitQuiz: () => void
-  reviewAnswers: () => void
-  restartQuiz: () => void
+  setSubjectQuery: (query: string) => void
+  fetchSubjects: () => Promise<void>
+  startQuiz: (subject: QuizCatalogItem) => Promise<void>
+  answerCurrentQuestion: (selectedIndex: number) => void
+  tickTimer: () => void
+  handleTimeout: () => void
+  resetToSubjectSelection: () => void
 }
 
-const questions: SkillQuestion[] = [
-  {
-    id: 'feature-planning',
-    category: 'Planning',
-    prompt: 'When you pick up a new feature, what does your first pass usually look like?',
-    context:
-      'This gives the test a quick read on how structured your delivery habits are before implementation begins.',
-    options: [
-      {
-        id: 'feature-planning-1',
-        label: 'I jump straight into code and adjust later',
-        description: 'Fast to start, but usually reactive once edge cases show up.',
-        score: 1,
-      },
-      {
-        id: 'feature-planning-2',
-        label: 'I skim the requirements and rough out a starting point',
-        description: 'Good enough for smaller tasks, but not always systematic.',
-        score: 2,
-      },
-      {
-        id: 'feature-planning-3',
-        label: 'I define the flow, constraints, and likely UI states first',
-        description: 'Balanced and reliable for most real product work.',
-        score: 3,
-      },
-      {
-        id: 'feature-planning-4',
-        label: 'I map risks, dependencies, states, and success metrics before building',
-        description: 'A mature workflow that reduces surprises later in delivery.',
-        score: 4,
-      },
-    ],
-  },
-  {
-    id: 'debugging',
-    category: 'Debugging',
-    prompt: 'A bug only appears in production. What is your most natural next step?',
-    context:
-      'The goal here is to understand how methodically you isolate issues under uncertainty.',
-    options: [
-      {
-        id: 'debugging-1',
-        label: 'Try a few quick fixes and redeploy',
-        description: 'Can work occasionally, but usually increases guesswork.',
-        score: 1,
-      },
-      {
-        id: 'debugging-2',
-        label: 'Reproduce it locally and inspect the obvious code path',
-        description: 'A reasonable start, especially if the issue is straightforward.',
-        score: 2,
-      },
-      {
-        id: 'debugging-3',
-        label: 'Compare environments, logs, inputs, and recent changes',
-        description: 'A structured way to narrow the source quickly.',
-        score: 3,
-      },
-      {
-        id: 'debugging-4',
-        label: 'Instrument the issue, isolate the trigger, and validate a fix safely',
-        description: 'High-signal debugging that scales well across complex systems.',
-        score: 4,
-      },
-    ],
-  },
-  {
-    id: 'responsive-design',
-    category: 'Responsive Design',
-    prompt: 'How do you usually approach responsive UI work?',
-    context:
-      'This checks how confidently you design for real screens instead of a single static layout.',
-    options: [
-      {
-        id: 'responsive-design-1',
-        label: 'I mostly design for desktop and patch mobile later',
-        description: 'Common early habit, but it tends to create brittle layouts.',
-        score: 1,
-      },
-      {
-        id: 'responsive-design-2',
-        label: 'I test a few breakpoints and adjust what looks off',
-        description: 'Helpful, though still reactive to issues after they appear.',
-        score: 2,
-      },
-      {
-        id: 'responsive-design-3',
-        label: 'I think in layout systems, spacing rules, and content priorities',
-        description: 'A solid product-facing approach to responsive design.',
-        score: 3,
-      },
-      {
-        id: 'responsive-design-4',
-        label: 'I build mobile-first and tune behavior across density, motion, and hierarchy',
-        description: 'A refined approach that usually produces resilient interfaces.',
-        score: 4,
-      },
-    ],
-  },
-  {
-    id: 'testing',
-    category: 'Quality',
-    prompt: 'Which option best describes your testing habit?',
-    context:
-      'The app uses this to estimate how intentionally you protect the work you ship.',
-    options: [
-      {
-        id: 'testing-1',
-        label: 'I mostly test manually in the browser',
-        description: 'Useful for quick checks, but easy to miss regressions.',
-        score: 1,
-      },
-      {
-        id: 'testing-2',
-        label: 'I add tests when a task feels risky',
-        description: 'Better than none, though still inconsistent over time.',
-        score: 2,
-      },
-      {
-        id: 'testing-3',
-        label: 'I regularly cover key logic and important user flows',
-        description: 'A dependable habit for ongoing product work.',
-        score: 3,
-      },
-      {
-        id: 'testing-4',
-        label: 'I design tests as part of implementation and use them to guide confidence',
-        description: 'A strong engineering pattern that supports safe iteration.',
-        score: 4,
-      },
-    ],
-  },
-  {
-    id: 'state-management',
-    category: 'State Management',
-    prompt: 'How comfortable are you managing shared app state in React?',
-    context:
-      'This question aligns well with the sort of architecture choices this project will make next.',
-    options: [
-      {
-        id: 'state-management-1',
-        label: 'I usually keep everything local and hope it stays manageable',
-        description: 'Fine at very small scale, but difficult to grow cleanly.',
-        score: 1,
-      },
-      {
-        id: 'state-management-2',
-        label: 'I can wire shared state, though the structure can get messy',
-        description: 'You are moving past basics, but there is room to tighten patterns.',
-        score: 2,
-      },
-      {
-        id: 'state-management-3',
-        label: 'I choose state boundaries intentionally and keep actions predictable',
-        description: 'A reliable level for most production React apps.',
-        score: 3,
-      },
-      {
-        id: 'state-management-4',
-        label: 'I model shared state around flows, derived data, and long-term maintainability',
-        description: 'Strong architecture thinking with room for complex interfaces.',
-        score: 4,
-      },
-    ],
-  },
-]
+const QUESTION_COUNT = 10
+const QUESTION_DURATION = 60
+
+function getClientEnv() {
+  const env = import.meta.env as ImportMetaEnv & {
+    BASE_LIST_URL?: string
+    BASE_TEST_URL?: string
+  }
+
+  return {
+    listUrl: env.VITE_BASE_LIST_URL ?? env.BASE_LIST_URL ?? '',
+    testBaseUrl: env.VITE_BASE_TEST_URL ?? env.BASE_TEST_URL ?? '',
+  }
+}
+
+function shuffleArray<T>(items: T[]) {
+  const next = [...items]
+
+  for (let index = next.length - 1; index > 0; index -= 1) {
+    const randomIndex = Math.floor(Math.random() * (index + 1))
+    ;[next[index], next[randomIndex]] = [next[randomIndex], next[index]]
+  }
+
+  return next
+}
+
+function stripQuestionPrefix(question: string) {
+  return question.replace(/^Q\d+\.\s*/i, '').trim()
+}
+
+function buildQuizState(
+  questions: QuizQuestion[],
+  answers: Record<string, StoredAnswer>,
+  currentQuestionIndex: number,
+  score: number,
+  selectedIndex: StoredAnswer,
+) {
+  const currentQuestion = questions[currentQuestionIndex]
+
+  if (!currentQuestion) {
+    return null
+  }
+
+  const nextAnswers = {
+    ...answers,
+    [currentQuestion.id]: selectedIndex,
+  }
+  const isCorrect = selectedIndex === currentQuestion.correctIndex
+  const isLastQuestion = currentQuestionIndex >= questions.length - 1
+
+  return {
+    answers: nextAnswers,
+    currentQuestionIndex: isLastQuestion
+      ? currentQuestionIndex
+      : currentQuestionIndex + 1,
+    score: score + (isCorrect ? 1 : 0),
+    status: isLastQuestion ? ('results' as const) : ('quiz' as const),
+    timeRemaining: isLastQuestion ? 0 : QUESTION_DURATION,
+  }
+}
 
 export const useSkillGaugeStore = create<SkillGaugeState>()(
   persist(
     (set, get) => ({
       theme: 'dark',
-      questions,
-      currentQuestionIndex: 0,
+      status: 'loading-subjects',
+      subjects: [],
+      subjectQuery: '',
+      selectedSubject: null,
+      questions: [],
       answers: {},
-      isComplete: false,
+      currentQuestionIndex: 0,
+      questionDuration: QUESTION_DURATION,
+      timeRemaining: QUESTION_DURATION,
+      score: 0,
+      errorMessage: null,
       toggleTheme: () =>
         set((state) => ({
           theme: state.theme === 'dark' ? 'light' : 'dark',
         })),
-      selectAnswer: (questionId, optionId) =>
-        set((state) => ({
-          answers: {
-            ...state.answers,
-            [questionId]: optionId,
-          },
-        })),
-      nextQuestion: () =>
-        set((state) => ({
-          currentQuestionIndex: Math.min(
-            state.currentQuestionIndex + 1,
-            state.questions.length - 1,
-          ),
-        })),
-      previousQuestion: () =>
-        set((state) => ({
-          currentQuestionIndex: Math.max(state.currentQuestionIndex - 1, 0),
-        })),
-      submitQuiz: () => {
-        const { answers, questions: allQuestions } = get()
+      setSubjectQuery: (query) => set({ subjectQuery: query }),
+      fetchSubjects: async () => {
+        const { listUrl } = getClientEnv()
 
-        if (Object.keys(answers).length === allQuestions.length) {
-          set({ isComplete: true })
+        if (!listUrl) {
+          set({
+            status: 'error',
+            errorMessage:
+              'The subject list URL is missing. Add VITE_BASE_LIST_URL to your .env file.',
+          })
+          return
+        }
+
+        set({
+          status: 'loading-subjects',
+          errorMessage: null,
+        })
+
+        try {
+          const response = await fetch(listUrl)
+
+          if (!response.ok) {
+            throw new Error(`Subject list request failed with ${response.status}`)
+          }
+
+          const payload = (await response.json()) as QuizCatalogResponse
+
+          if (!Array.isArray(payload.quizzes) || payload.quizzes.length === 0) {
+            throw new Error('No quiz subjects were returned from the API.')
+          }
+
+          set({
+            status: 'ready',
+            subjects: payload.quizzes,
+            errorMessage: null,
+          })
+        } catch {
+          set({
+            status: 'error',
+            errorMessage:
+              'I could not load the subject list. Check the URL or your network connection and try again.',
+          })
         }
       },
-      reviewAnswers: () =>
+      startQuiz: async (subject) => {
+        const { testBaseUrl } = getClientEnv()
+
+        if (!testBaseUrl) {
+          set({
+            status: 'ready',
+            errorMessage:
+              'The quiz data URL is missing. Add VITE_BASE_TEST_URL to your .env file.',
+          })
+          return
+        }
+
         set({
-          isComplete: false,
-          currentQuestionIndex: 0,
-        }),
-      restartQuiz: () =>
-        set({
-          currentQuestionIndex: 0,
+          status: 'loading-quiz',
+          selectedSubject: subject,
+          questions: [],
           answers: {},
-          isComplete: false,
-        }),
+          currentQuestionIndex: 0,
+          timeRemaining: QUESTION_DURATION,
+          score: 0,
+          errorMessage: null,
+        })
+
+        try {
+          const quizUrl = `${testBaseUrl.replace(/\/+$/, '')}/${subject.fileName}`
+          const response = await fetch(quizUrl)
+
+          if (!response.ok) {
+            throw new Error(`Quiz request failed with ${response.status}`)
+          }
+
+          const payload = (await response.json()) as RemoteQuizQuestion[]
+
+          if (!Array.isArray(payload) || payload.length === 0) {
+            throw new Error('No questions were returned for this subject.')
+          }
+
+          const randomizedQuestions = shuffleArray(payload)
+            .slice(0, Math.min(QUESTION_COUNT, payload.length))
+            .map((item, index) => ({
+              id: `${subject.fileName}-${index}-${item._ps}`,
+              prompt: stripQuestionPrefix(item.question),
+              options: item.options,
+              correctIndex: item._ps,
+            }))
+
+          set({
+            status: 'quiz',
+            selectedSubject: subject,
+            questions: randomizedQuestions,
+            answers: {},
+            currentQuestionIndex: 0,
+            timeRemaining: QUESTION_DURATION,
+            score: 0,
+            errorMessage: null,
+          })
+        } catch {
+          set({
+            status: 'ready',
+            selectedSubject: null,
+            questions: [],
+            answers: {},
+            currentQuestionIndex: 0,
+            timeRemaining: QUESTION_DURATION,
+            score: 0,
+            errorMessage:
+              'I could not load that quiz yet. Please try again or choose a different subject.',
+          })
+        }
+      },
+      answerCurrentQuestion: (selectedIndex) => {
+        const state = get()
+
+        if (state.status !== 'quiz') {
+          return
+        }
+
+        const currentQuestion = state.questions[state.currentQuestionIndex]
+
+        if (
+          !currentQuestion ||
+          Object.hasOwn(state.answers, currentQuestion.id)
+        ) {
+          return
+        }
+
+        const nextState = buildQuizState(
+          state.questions,
+          state.answers,
+          state.currentQuestionIndex,
+          state.score,
+          selectedIndex,
+        )
+
+        if (nextState) {
+          set(nextState)
+        }
+      },
+      tickTimer: () => {
+        const state = get()
+
+        if (state.status !== 'quiz' || state.timeRemaining <= 0) {
+          return
+        }
+
+        set({
+          timeRemaining: state.timeRemaining - 1,
+        })
+      },
+      handleTimeout: () => {
+        const state = get()
+
+        if (state.status !== 'quiz') {
+          return
+        }
+
+        const currentQuestion = state.questions[state.currentQuestionIndex]
+
+        if (
+          !currentQuestion ||
+          Object.hasOwn(state.answers, currentQuestion.id)
+        ) {
+          return
+        }
+
+        const nextState = buildQuizState(
+          state.questions,
+          state.answers,
+          state.currentQuestionIndex,
+          state.score,
+          null,
+        )
+
+        if (nextState) {
+          set(nextState)
+        }
+      },
+      resetToSubjectSelection: () =>
+        set((state) => ({
+          status: state.subjects.length > 0 ? 'ready' : 'loading-subjects',
+          subjectQuery: '',
+          selectedSubject: null,
+          questions: [],
+          answers: {},
+          currentQuestionIndex: 0,
+          timeRemaining: QUESTION_DURATION,
+          score: 0,
+          errorMessage: null,
+        })),
     }),
     {
-      name: 'skill-gauge-theme',
+      name: 'skill-gauge-preferences',
       partialize: (state) => ({
         theme: state.theme,
       }),
